@@ -56,14 +56,15 @@ def gameover(screen: pg.Surface) -> None:
 def init_bb_imgs() -> tuple[list[pg.Surface], list[int]]:
     bb_imgs = []
     bb_accs = []
-    # 爆弾Surfaceのlist
+
+    # 爆弾Surfaceのlist内
     for r in range(1, 11):
             bb_img = pg.Surface((20 * r, 20 * r))
             bb_img.set_colorkey((0, 0, 0))
             pg.draw.circle(bb_img, (255, 0, 0), (10 * r, 10 * r), 10 * r)
             bb_imgs.append(bb_img)
 
-    # 加速度のlist
+    # 加速度のlist内
     bb_accs = [a for a in range(1, 11)]
 
     return bb_imgs, bb_accs
@@ -94,7 +95,7 @@ def main():
     # 速度
     vx, vy = 5, 5
 
-    init_bb_imgs()
+    bb_imgs, bb_accs = init_bb_imgs()
 
     while True:
         screen.blit(bg_img, [0, 0]) 
