@@ -2,11 +2,12 @@ import os
 import sys
 import pygame as pg
 import random
-
+import time
 
 WIDTH, HEIGHT = 1100, 650
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
+# 画面内にとどめる
 def check_bound(rct: pg.Rect):
     """
     Rectが画面内かどうかを判定
@@ -23,6 +24,32 @@ def check_bound(rct: pg.Rect):
 
     return yoko, tate
 
+# gameover画面表示
+def gameover(screen: pg.Surface) -> None:
+    # 黒いSurface
+    black = pg.Surface((WIDTH, HEIGHT))
+    black.fill((0,0,0))
+    black.set_alpha(200)
+
+    # フォント
+    font = pg.font.Font(None, 80)
+    text = font.render("Game Over", True, (255, 255, 255))
+
+    #こうかとん画像（泣いてる）
+    cry_img = pg.transform.rotozoom(pg.image.load("fig/8.png"), 0, 0.9)
+    cry_rct = cry_img.get_rect()
+    cry_rct.center = WIDTH//2, HEIGHT//2 - 50
+
+    #描画
+    screen.blit(black, [0, 0])
+    screen.blit(cry_img, cry_rct)
+
+    text_rct = text.get_rect()
+    text_rct.center = WIDTH//2, HEIGHT//2 + 100
+    screen.blit(text, text_rct)
+
+    pg.display.update()
+    time.sleep(5)
 
 def main():
     pg.display.set_caption("逃げろ！こうかとん")
@@ -32,14 +59,15 @@ def main():
     kk_rct = kk_img.get_rect()
     kk_rct.center = 300, 200
     clock = pg.time.Clock()
-    tmr = 0
+    # tmr = 0
+    
 
 
-    # 爆弾Surface（20×20くらいでOK）
+    # 爆弾Surface
     bb_img = pg.Surface((20, 20))
     bb_img.set_colorkey((0, 0, 0))  # 黒を透明に
 
-    # 赤い円（半径10）
+    # 赤い円
     pg.draw.circle(bb_img, (255, 0, 0), (10, 10), 10)
 
     # 爆弾のRect
@@ -93,11 +121,14 @@ def main():
 
         # 衝突
         if kk_rct.colliderect(bb_rct):
-            print("Game Over")
+            gameover(screen)
             return
 
         pg.display.update()
         clock.tick(50)
+        
+
+
 
 
 if __name__ == "__main__":
