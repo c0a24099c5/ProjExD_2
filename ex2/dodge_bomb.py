@@ -26,6 +26,10 @@ def check_bound(rct: pg.Rect):
 
 # gameover画面表示
 def gameover(screen: pg.Surface) -> None:
+    """
+    入力：screenオブジェクト
+    戻り値：なし
+    """
     # 黒いSurface
     black = pg.Surface((WIDTH, HEIGHT))
     black.fill((0, 0, 0))
@@ -54,6 +58,10 @@ def gameover(screen: pg.Surface) -> None:
 
 # 爆弾拡大、加速
 def init_bb_imgs() -> tuple[list[pg.Surface], list[int]]:
+    """
+    入力：なし
+    戻り値：爆弾SurfaceListと加速度List
+    """
     bb_imgs = []
     bb_accs = []
 
@@ -77,32 +85,18 @@ def main():
     kk_rct = kk_img.get_rect()
     kk_rct.center = 300, 200
     clock = pg.time.Clock()
-    # tmr = 0
-
-    # 爆弾Surface
-    bb_img = pg.Surface((20, 20))
-    bb_img.set_colorkey((0, 0, 0))  # 黒を透明に
-
-    # 赤い円
-    pg.draw.circle(bb_img, (255, 0, 0), (10, 10), 10)
-
-    # 爆弾のRect
-    bb_rct = bb_img.get_rect()
-
-    # ランダムな初期位置
-    bb_rct.center = random.randint(0, WIDTH), random.randint(0, HEIGHT)
-
-    # 速度
-    vx, vy = 5, 5
+    tmr = 0
 
     bb_imgs, bb_accs = init_bb_imgs()
+    bb_img = bb_imgs[0]
+    bb_rct = bb_img.get_rect(center = (random.randint(0, WIDTH), random.randint(0, HEIGHT)))
+    bb_mv = [5, 5]
 
     while True:
-        screen.blit(bg_img, [0, 0]) 
-
         for event in pg.event.get():
-            if event.type == pg.QUIT: 
+            if event.type == pg.QUIT:
                 return
+        screen.blit(bg_img, [0, 0]) 
 
         # キー入力
         key_lst = pg.key.get_pressed()
@@ -121,12 +115,24 @@ def main():
                 sum_mv[1] += mv[1]
         
         # 爆弾
-        bb_rct.move_ip(vx, vy)
+        idx = min(tmr // 500, 9)
+        acc = bb_accs[idx]
+        avx = bb_mv[0] * acc
+        avy = bb_mv[1] * acc
+        bb_img = bb_imgs[idx]
+        old_center = bb_rct.center
+        bb_rct = bb_img.get_rect()
+        bb_rct.center = old_center
+        bb_rct.width = bb_img.get_rect().width
+        bb_rct.height = bb_img.get_rect().height
+
+
+        bb_rct.move_ip(avx, avy)
         yoko, tate = check_bound(bb_rct)
         if not yoko:
-            vx *= -1
+            bb_mv[0] *= -1
         if not tate:
-            vy *= -1
+            bb_mv[1] *= -1
         screen.blit(bb_img, bb_rct)
 
         # こうかとん
@@ -143,6 +149,7 @@ def main():
             return
 
         pg.display.update()
+        tmr += 1
         clock.tick(50)
         
 
