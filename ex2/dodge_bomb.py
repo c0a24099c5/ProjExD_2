@@ -16,12 +16,10 @@ def check_bound(rct: pg.Rect):
     """
     yoko = True
     tate = True
-
     if rct.left < 0 or rct.right > WIDTH:
         yoko = False
     if rct.top < 0 or rct.bottom > HEIGHT:
         tate = False
-
     return yoko, tate
 
 # gameover画面表示
