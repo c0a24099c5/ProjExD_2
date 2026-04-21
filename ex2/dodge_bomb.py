@@ -1,6 +1,7 @@
 import os
 import sys
 import pygame as pg
+import random
 
 
 WIDTH, HEIGHT = 1100, 650
@@ -16,22 +17,41 @@ def main():
     kk_rct.center = 300, 200
     clock = pg.time.Clock()
     tmr = 0
+
+
+    # 爆弾Surface（20×20くらいでOK）
+    bb_img = pg.Surface((20, 20))
+    bb_img.set_colorkey((0, 0, 0))  # 黒を透明に
+
+    # 赤い円（半径10）
+    pg.draw.circle(bb_img, (255, 0, 0), (10, 10), 10)
+
+    # 爆弾のRect
+    bb_rct = bb_img.get_rect()
+
+    # ランダムな初期位置
+    bb_rct.center = random.randint(0, WIDTH), random.randint(0, HEIGHT)
+
+    # 速度
+    vx, vy = 5, 5
+
     while True:
+        screen.blit(bg_img, [0, 0]) 
+
+        # 移動
+        bb_rct.move_ip(vx, vy)
+
+        # 描画
+        screen.blit(bb_img, bb_rct)
+
         for event in pg.event.get():
             if event.type == pg.QUIT: 
                 return
-        screen.blit(bg_img, [0, 0]) 
+        
 
         key_lst = pg.key.get_pressed()
         
-        # if key_lst[pg.K_UP]:
-        #     sum_mv[1] -= 5
-        # if key_lst[pg.K_DOWN]:
-        #     sum_mv[1] += 5
-        # if key_lst[pg.K_LEFT]:
-        #     sum_mv[0] -= 5
-        # if key_lst[pg.K_RIGHT]:
-        #     sum_mv[0] += 5
+
         DELTA = { #辞書
             pg.K_UP:   (0, -5), #上
             pg.K_DOWN: (0,  5), #下
