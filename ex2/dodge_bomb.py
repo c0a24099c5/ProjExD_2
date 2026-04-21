@@ -28,28 +28,45 @@ def check_bound(rct: pg.Rect):
 def gameover(screen: pg.Surface) -> None:
     # 黒いSurface
     black = pg.Surface((WIDTH, HEIGHT))
-    black.fill((0,0,0))
-    black.set_alpha(200)
+    black.fill((0, 0, 0))
+    black.set_alpha(150)
 
     # フォント
     font = pg.font.Font(None, 80)
     text = font.render("Game Over", True, (255, 255, 255))
+    text_rct = text.get_rect(center=(WIDTH//2, HEIGHT//2))
 
-    #こうかとん画像（泣いてる）
-    cry_img = pg.transform.rotozoom(pg.image.load("fig/8.png"), 0, 0.9)
-    cry_rct = cry_img.get_rect()
-    cry_rct.center = WIDTH//2, HEIGHT//2 - 50
+    # こうかとん画像（泣いてる）
+    kk_img = pg.transform.rotozoom(pg.image.load("fig/8.png"), 0, 0.9)
+    left_rct = kk_img.get_rect()
+    left_rct.center = WIDTH//2 - 200, HEIGHT//2
+    right_rct = kk_img.get_rect()
+    right_rct.center = WIDTH//2 + 200, HEIGHT//2
 
-    #描画
-    screen.blit(black, [0, 0])
-    screen.blit(cry_img, cry_rct)
-
-    text_rct = text.get_rect()
-    text_rct.center = WIDTH//2, HEIGHT//2 + 100
+    # 描画
+    screen.blit(black, (0, 0))
     screen.blit(text, text_rct)
+    screen.blit(kk_img, left_rct)
+    screen.blit(kk_img, right_rct)
 
     pg.display.update()
     time.sleep(5)
+
+# 爆弾拡大、加速
+def init_bb_imgs() -> tuple[list[pg.Surface], list[int]]:
+    bb_imgs = []
+    bb_accs = []
+    # 爆弾Surfaceのlist
+    for r in range(1, 11):
+            bb_img = pg.Surface((20 * r, 20 * r))
+            bb_img.set_colorkey((0, 0, 0))
+            pg.draw.circle(bb_img, (255, 0, 0), (10 * r, 10 * r), 10 * r)
+            bb_imgs.append(bb_img)
+
+    # 加速度のlist
+    bb_accs = [a for a in range(1, 11)]
+
+    return bb_imgs, bb_accs
 
 def main():
     pg.display.set_caption("逃げろ！こうかとん")
@@ -60,8 +77,6 @@ def main():
     kk_rct.center = 300, 200
     clock = pg.time.Clock()
     # tmr = 0
-    
-
 
     # 爆弾Surface
     bb_img = pg.Surface((20, 20))
@@ -78,6 +93,8 @@ def main():
 
     # 速度
     vx, vy = 5, 5
+
+    init_bb_imgs()
 
     while True:
         screen.blit(bg_img, [0, 0]) 
@@ -101,7 +118,7 @@ def main():
             if key_lst[key]:
                 sum_mv[0] += mv[0]
                 sum_mv[1] += mv[1]
-
+        
         # 爆弾
         bb_rct.move_ip(vx, vy)
         yoko, tate = check_bound(bb_rct)
